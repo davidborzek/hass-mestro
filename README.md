@@ -18,9 +18,13 @@ It talks to the player's embedded web endpoint over its WebSocket channel
 
 ## Install
 
-**HACS (custom repository):** HACS → ⋮ → *Custom repositories* → add this
-repository as category *Integration* → install *mestro* → restart Home
-Assistant.
+[![Open your Home Assistant instance and open this repository in the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=davidborzek&repository=hass-mestro&category=integration)
+
+**Marketplace:** click the badge — it opens this repository in your Home
+Assistant's Marketplace (2026.11 and newer) or in HACS (older releases) and
+offers to add it. Install *mestro*; the integration loads without a restart.
+
+[![Open your Home Assistant instance and start setting up mestro.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=mestro)
 
 **Manual:** copy `custom_components/mestro/` into your Home Assistant
 `config/custom_components/` directory and restart.
@@ -90,8 +94,11 @@ The tests run against a fake mestro (`tests/fake_mestro.py`): an aiohttp
 server speaking `/pair` and `/ws` — it is the contract for the protocol in
 mestro's `docs/remote.md`. The real-socket tests need loopback only.
 
+Translations live in `translations/` (`en.json` complete, `de.json`); custom
+integrations ship no `strings.json`.
+
 CI (`.github/workflows/ci.yml`) runs ruff, pytest, hassfest and the HACS
-action.
+action — both have to pass for the Marketplace catalog.
 
 ## License
 
