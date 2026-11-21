@@ -1,38 +1,47 @@
+# Every action is pinned to a full commit SHA; Renovate bumps them.
 name: CI
 
 on:
   push:
     branches: [main]
   pull_request:
+  # catches breakage from new Home Assistant releases without a push
   schedule:
     - cron: "0 5 * * 1"
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.14"
-      - run: pip install -r requirements_test.txt ruff==0.15.14
+          cache: pip
+          cache-dependency-path: requirements_test.txt
+      - run: pip install -r requirements_test.txt
       - run: ruff check .
       - run: ruff format --check .
       - run: pytest
 
+  # both checks gate the Marketplace catalog
   hassfest:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: home-assistant/actions/hassfest@master
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: home-assistant/actions/hassfest@07f46fd2e19967768b5fd3000f91f857452b767c # master
 
   hacs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: hacs/action@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: hacs/action@1ebf01c408f29afcb6406bd431bc98fd8cbb15aa # main
         with:
           category: integration

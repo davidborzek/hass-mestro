@@ -1,0 +1,31 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits"],
+  "dependencyDashboard": true,
+  "schedule": ["before 6am on monday"],
+  "timezone": "Europe/Berlin",
+  "platformAutomerge": true,
+  "nix": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "description": "test dependencies (HA via the pytest plugin, ruff): one PR, automerge once CI passes",
+      "matchManagers": ["pip_requirements"],
+      "groupName": "test dependencies",
+      "automerge": true
+    },
+    {
+      "description": "keep GitHub Actions pinned to commit digests, one grouped PR",
+      "matchManagers": ["github-actions"],
+      "pinDigests": true,
+      "groupName": "github actions",
+      "automerge": true
+    },
+    {
+      "description": "major updates land as their own PRs, never automerged",
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    }
+  ]
+}
