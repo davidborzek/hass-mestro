@@ -12,6 +12,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 import pytest
 
@@ -147,3 +148,18 @@ async def test_unavailable_while_disconnected(
     # HA skips unavailable entities: nothing reaches the player
     await call(hass, SERVICE_TURN_ON, **{ATTR_BRIGHTNESS: 10})
     assert brightness_writes(fake_mestro) == []
+
+
+async def test_a_rejected_brightness_is_a_translated_error(
+    hass: HomeAssistant, fake_mestro: FakeMestro
+) -> None:
+    await setup_integration(hass, fake_mestro)
+    # the player answers every settings write with an error
+    fake_mestro.reject_settings = True
+
+    with pytest.raises(HomeAssistantError) as raised:
+        await call(hass, SERVICE_TURN_ON, **{ATTR_BRIGHTNESS: 255})
+    assert raised.value.translation_domain == "mestro"
+    assert raised.value.translation_key == "brightness_failed"
+    assert raised.value.translation_placeholders is not None
+    assert raised.value.translation_placeholders["level"] == "100"

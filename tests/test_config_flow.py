@@ -255,6 +255,40 @@ async def test_zeroconf_ignores_players_it_cannot_speak_to(
     assert result["reason"] == "unsupported_player"
 
 
+async def test_zeroconf_takes_the_ipv4_address(
+    hass: HomeAssistant, fake_mestro: FakeMestro, setup_entry: None
+) -> None:
+    # the player listens on IPv4 only: an IPv6 address first must not win
+    info = zeroconf_info(fake_mestro)
+    info.ip_addresses = [ip_address("fd00::1"), ip_address(fake_mestro.host)]
+    info.ip_address = info.ip_addresses[0]
+    info.hostname = "mestro.local."
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_ZEROCONF}, data=info
+    )
+    assert result["step_id"] == "zeroconf_confirm"
+    assert result["description_placeholders"]["host"] == fake_mestro.host
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_PIN: PIN}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_HOST] == fake_mestro.host
+
+
+async def test_zeroconf_aborts_without_an_ipv4_address(
+    hass: HomeAssistant, fake_mestro: FakeMestro
+) -> None:
+    info = zeroconf_info(fake_mestro)
+    info.ip_addresses = [ip_address("fd00::1"), ip_address("fe80::1")]
+    info.ip_address = info.ip_addresses[0]
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_ZEROCONF}, data=info
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "not_ipv4_device"
+
+
 async def test_zeroconf_for_a_known_player_updates_its_address(
     hass: HomeAssistant, fake_mestro: FakeMestro
 ) -> None:

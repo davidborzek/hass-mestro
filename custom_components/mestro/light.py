@@ -11,6 +11,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.util.color import brightness_to_value, value_to_brightness
 
 from .client import MestroConnectionError, MestroRequestError
+from .const import DOMAIN
 from .coordinator import MestroConfigEntry, MestroCoordinator
 from .entity import MestroEntity
 
@@ -74,7 +75,9 @@ class MestroDisplayLight(MestroEntity, LightEntity):
                 await self.coordinator.client.async_set_brightness(level)
             except (MestroConnectionError, MestroRequestError) as err:
                 raise HomeAssistantError(
-                    f"The player did not accept brightness {level}: {err}"
+                    translation_domain=DOMAIN,
+                    translation_key="brightness_failed",
+                    translation_placeholders={"level": str(level), "error": str(err)},
                 ) from err
 
     async def async_turn_off(self, **kwargs: Any) -> None:

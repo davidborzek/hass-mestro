@@ -202,3 +202,16 @@ async def test_unavailable_while_disconnected_then_recovers(
     fake_mestro.accept_ws = True
     await eventually(lambda: hass.states.get(REMOTE).state == STATE_OFF)
     await asyncio.sleep(0)
+
+
+async def test_send_command_failure_is_a_translated_error(
+    hass: HomeAssistant, fake_mestro: FakeMestro
+) -> None:
+    await setup_integration(hass, fake_mestro)
+
+    with pytest.raises(HomeAssistantError) as raised:
+        await call(hass, SERVICE_SEND_COMMAND, **{ATTR_COMMAND: ["nonsense"]})
+    assert raised.value.translation_domain == "mestro"
+    assert raised.value.translation_key == "command_failed"
+    assert raised.value.translation_placeholders is not None
+    assert raised.value.translation_placeholders["command"] == "nonsense"

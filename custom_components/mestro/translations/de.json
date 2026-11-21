@@ -40,12 +40,19 @@
     },
     "abort": {
       "already_configured": "Dieser Player ist bereits eingerichtet.",
+      "not_ipv4_device": "Der Player hat keine IPv4-Adresse angekündigt. mestro bedient nur IPv4.",
       "reauth_successful": "Kopplung erneuert.",
       "unsupported_player": "Dieser Player spricht keine von der Integration unterstützte Protokollversion.",
       "wrong_device": "Das ist ein anderer Player als der eingerichtete."
     }
   },
   "exceptions": {
+    "brightness_failed": {
+      "message": "Der Player hat die Helligkeit {level} nicht übernommen: {error}"
+    },
+    "command_failed": {
+      "message": "Der Player hat '{command}' abgelehnt oder nicht erhalten: {error}"
+    },
     "unknown_activity": {
       "message": "Unbekannte Aktivität \"{activity}\"."
     }

@@ -99,8 +99,12 @@ class MestroConfigFlow(ConfigFlow, domain=DOMAIN):
         player_id = properties.get("id")
         if not player_id or properties.get("protocol") != str(SUPPORTED_PROTOCOL):
             return self.async_abort(reason="unsupported_player")
+        # the player listens on IPv4 only; `host` may be an IPv6 address
+        ipv4 = [ip for ip in discovery_info.ip_addresses if ip.version == 4]
+        if not ipv4:
+            return self.async_abort(reason="not_ipv4_device")
         await self.async_set_unique_id(player_id)
-        self._host = discovery_info.host
+        self._host = str(ipv4[0])
         self._port = discovery_info.port or DEFAULT_PORT
         self._abort_if_unique_id_configured(
             updates={CONF_HOST: self._host, CONF_PORT: self._port}

@@ -67,6 +67,7 @@ class FakeMestro:
         self.pair_attempts = 0
         self.ws_attempts = 0
         self.accept_ws = True
+        self.reject_settings = False
         self.sockets: list[web.WebSocketResponse] = []
         self.server: TestServer | None = None
 
@@ -138,6 +139,8 @@ class FakeMestro:
         if op == "ctl":
             return self._ctl(request_id, str(request.get("cmd", "")))
         if op == "settings" and request.get("action") == "set":
+            if self.reject_settings:
+                return {"id": request_id, "ok": False, "error": "refused"}
             return {"id": request_id, "ok": True}
         return {"id": request_id, "ok": False, "error": "unknown op"}
 

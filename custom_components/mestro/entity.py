@@ -46,5 +46,7 @@ class MestroEntity(CoordinatorEntity[MestroCoordinator]):
             await self.coordinator.client.async_ctl(command)
         except (MestroConnectionError, MestroRequestError) as err:
             raise HomeAssistantError(
-                f"The player refused or missed '{command}': {err}"
+                translation_domain=DOMAIN,
+                translation_key="command_failed",
+                translation_placeholders={"command": command, "error": str(err)},
             ) from err
