@@ -45,6 +45,11 @@
       "wrong_device": "This is a different player than the one set up."
     }
   },
+  "exceptions": {
+    "unknown_activity": {
+      "message": "Unknown activity \"{activity}\"."
+    }
+  },
   "entity": {
     "light": {
       "display": {

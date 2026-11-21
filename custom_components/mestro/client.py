@@ -141,6 +141,7 @@ class MestroClient:
         *,
         on_state: Callable[[MestroState], None] | None = None,
         on_disconnected: Callable[[], None] | None = None,
+        on_connected: Callable[[], None] | None = None,
         on_auth_failed: Callable[[], None] | None = None,
         backoff: Sequence[float] | None = None,
         sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
@@ -154,6 +155,7 @@ class MestroClient:
         self._headers = {"Cookie": f"{PAIR_COOKIE}={token}"}
         self._on_state = on_state
         self._on_disconnected = on_disconnected
+        self._on_connected = on_connected
         self._on_auth_failed = on_auth_failed
 
         self.hello: MestroHello | None = None
@@ -165,22 +167,25 @@ class MestroClient:
         self._pending: dict[int, asyncio.Future[dict[str, Any]]] = {}
         self._next_id = 0
         self._state_received = asyncio.Event()
+        self._ready = False
 
     @property
     def connected(self) -> bool:
-        """Whether a WebSocket is currently open."""
-        return self._ws is not None and not self._ws.closed
+        """Whether the handshake finished and the WebSocket is still open."""
+        return self._ready and self._ws is not None and not self._ws.closed
 
     def set_callbacks(
         self,
         *,
         on_state: Callable[[MestroState], None],
         on_disconnected: Callable[[], None],
+        on_connected: Callable[[], None],
         on_auth_failed: Callable[[], None],
     ) -> None:
         """Replace the callbacks (the coordinator exists after the first connect)."""
         self._on_state = on_state
         self._on_disconnected = on_disconnected
+        self._on_connected = on_connected
         self._on_auth_failed = on_auth_failed
 
     async def async_connect(self) -> MestroHello:
@@ -279,6 +284,9 @@ class MestroClient:
             await self._teardown()
             raise
         self.hello = hello
+        self._ready = True
+        if self._on_connected is not None:
+            self._on_connected()
 
     async def _read(self, ws: aiohttp.ClientWebSocketResponse) -> None:
         try:
@@ -340,6 +348,7 @@ class MestroClient:
                 break
 
     async def _teardown(self) -> None:
+        self._ready = False
         ws, self._ws = self._ws, None
         reader, self._reader = self._reader, None
         if reader is not None:

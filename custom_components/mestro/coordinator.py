@@ -35,6 +35,7 @@ class MestroCoordinator(DataUpdateCoordinator[MestroState]):
         client.set_callbacks(
             on_state=self._handle_state,
             on_disconnected=self.async_update_listeners,
+            on_connected=self.async_update_listeners,
             on_auth_failed=self._handle_auth_failed,
         )
 

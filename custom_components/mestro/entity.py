@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .client import MestroState
+from .client import MestroConnectionError, MestroRequestError, MestroState
 from .const import DOMAIN
 from .coordinator import MestroCoordinator
 
@@ -38,3 +39,12 @@ class MestroEntity(CoordinatorEntity[MestroCoordinator]):
     def state_data(self) -> MestroState:
         """The latest pushed state."""
         return self.coordinator.data
+
+    async def async_ctl(self, command: str) -> None:
+        """Run a `ctl` command; failures surface as a service-call error."""
+        try:
+            await self.coordinator.client.async_ctl(command)
+        except (MestroConnectionError, MestroRequestError) as err:
+            raise HomeAssistantError(
+                f"The player refused or missed '{command}': {err}"
+            ) from err
