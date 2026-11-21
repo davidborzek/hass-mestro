@@ -171,6 +171,18 @@ class MestroClient:
         """Whether a WebSocket is currently open."""
         return self._ws is not None and not self._ws.closed
 
+    def set_callbacks(
+        self,
+        *,
+        on_state: Callable[[MestroState], None],
+        on_disconnected: Callable[[], None],
+        on_auth_failed: Callable[[], None],
+    ) -> None:
+        """Replace the callbacks (the coordinator exists after the first connect)."""
+        self._on_state = on_state
+        self._on_disconnected = on_disconnected
+        self._on_auth_failed = on_auth_failed
+
     async def async_connect(self) -> MestroHello:
         """Open the socket once; raise on failure, never retry."""
         await self._open()

@@ -1,0 +1,60 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "Add a mestro player",
+        "description": "Enter the address of the player. A player image serves on port 80; a desktop run needs the port, e.g. `192.168.1.20:8787`.",
+        "data": {
+          "host": "Host"
+        },
+        "data_description": {
+          "host": "Hostname or IP address, optionally with `:port`."
+        }
+      },
+      "zeroconf_confirm": {
+        "title": "Pair with mestro",
+        "description": "Found the player {name} at {host}. Pairing asks for the PIN in the next step."
+      },
+      "pin": {
+        "title": "Pair with mestro",
+        "description": "Enter the pairing PIN of the player at {host}. It is shown on the player's Connection page.",
+        "data": {
+          "pin": "PIN"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Pair with mestro again",
+        "description": "The player {name} at {host} no longer accepts the stored pairing. Enter its current PIN.",
+        "data": {
+          "pin": "PIN"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the player.",
+      "invalid_auth": "The PIN is wrong.",
+      "invalid_host": "Enter a host name or IP address, optionally followed by `:port`.",
+      "too_many_attempts": "Too many attempts. Wait 30 seconds and try again.",
+      "unsupported_player": "This player does not speak a protocol version this integration supports."
+    },
+    "abort": {
+      "already_configured": "This player is already configured.",
+      "reauth_successful": "Pairing renewed.",
+      "unsupported_player": "This player does not speak a protocol version this integration supports.",
+      "wrong_device": "This is a different player than the one set up."
+    }
+  },
+  "entity": {
+    "light": {
+      "display": {
+        "name": "Display"
+      }
+    },
+    "select": {
+      "vu_skin": {
+        "name": "VU skin"
+      }
+    }
+  }
+}

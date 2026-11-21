@@ -1,0 +1,60 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "mestro-Player hinzufügen",
+        "description": "Gib die Adresse des Players ein. Ein Player-Image läuft auf Port 80; ein Desktop-Start braucht den Port, z. B. `192.168.1.20:8787`.",
+        "data": {
+          "host": "Host"
+        },
+        "data_description": {
+          "host": "Hostname oder IP-Adresse, optional mit `:Port`."
+        }
+      },
+      "zeroconf_confirm": {
+        "title": "Mit mestro koppeln",
+        "description": "Der Player {name} wurde unter {host} gefunden. Im nächsten Schritt wird die PIN abgefragt."
+      },
+      "pin": {
+        "title": "Mit mestro koppeln",
+        "description": "Gib die Kopplungs-PIN des Players unter {host} ein. Sie steht auf der Verbindungsseite des Players.",
+        "data": {
+          "pin": "PIN"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Erneut mit mestro koppeln",
+        "description": "Der Player {name} unter {host} akzeptiert die gespeicherte Kopplung nicht mehr. Gib seine aktuelle PIN ein.",
+        "data": {
+          "pin": "PIN"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zum Player fehlgeschlagen.",
+      "invalid_auth": "Die PIN ist falsch.",
+      "invalid_host": "Gib einen Hostnamen oder eine IP-Adresse ein, optional gefolgt von `:Port`.",
+      "too_many_attempts": "Zu viele Versuche. Warte 30 Sekunden und versuche es erneut.",
+      "unsupported_player": "Dieser Player spricht keine von der Integration unterstützte Protokollversion."
+    },
+    "abort": {
+      "already_configured": "Dieser Player ist bereits eingerichtet.",
+      "reauth_successful": "Kopplung erneuert.",
+      "unsupported_player": "Dieser Player spricht keine von der Integration unterstützte Protokollversion.",
+      "wrong_device": "Das ist ein anderer Player als der eingerichtete."
+    }
+  },
+  "entity": {
+    "light": {
+      "display": {
+        "name": "Display"
+      }
+    },
+    "select": {
+      "vu_skin": {
+        "name": "VU-Skin"
+      }
+    }
+  }
+}

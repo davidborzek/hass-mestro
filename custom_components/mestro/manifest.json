@@ -1,0 +1,13 @@
+{
+  "domain": "mestro",
+  "name": "mestro",
+  "codeowners": ["@davidborzek"],
+  "config_flow": true,
+  "documentation": "https://github.com/davidborzek/hass-mestro",
+  "integration_type": "device",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/davidborzek/hass-mestro/issues",
+  "requirements": [],
+  "version": "0.1.0",
+  "zeroconf": ["_mestro._tcp.local."]
+}
