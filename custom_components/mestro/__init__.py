@@ -16,7 +16,7 @@ from .client import (
 from .const import CONF_TOKEN
 from .coordinator import MestroConfigEntry, MestroCoordinator
 
-PLATFORMS: list[Platform] = [Platform.REMOTE]
+PLATFORMS: list[Platform] = [Platform.REMOTE, Platform.LIGHT, Platform.SELECT]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: MestroConfigEntry) -> bool:
