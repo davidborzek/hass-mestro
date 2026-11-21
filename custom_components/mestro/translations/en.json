@@ -51,7 +51,7 @@
       "message": "The player did not accept brightness {level}: {error}"
     },
     "command_failed": {
-      "message": "The player refused or missed '{command}': {error}"
+      "message": "The player refused or missed the command {command}: {error}"
     },
     "unknown_activity": {
       "message": "Unknown activity \"{activity}\"."
