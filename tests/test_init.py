@@ -17,6 +17,7 @@ ENTITIES = (
     "remote.wohnzimmer",
     "light.wohnzimmer_display",
     "select.wohnzimmer_vu_skin",
+    "select.wohnzimmer_view",
 )
 
 
@@ -118,4 +119,4 @@ async def test_reconnect_after_a_player_reboot_keeps_the_entities(
     await eventually(lambda: hass.states.get(ENTITIES[0]).state == STATE_ON)
     assert len(hass.states.async_entity_ids("remote")) == 1
     assert len(hass.states.async_entity_ids("light")) == 1
-    assert len(hass.states.async_entity_ids("select")) == 1
+    assert len(hass.states.async_entity_ids("select")) == 2

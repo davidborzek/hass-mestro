@@ -57,6 +57,7 @@ One device per player (identified by its MAC-based id).
 |---|---|
 | `remote.<name>` | on/off = standby off/on. Activities `Now playing`, `Queue`, `VU`, `Home`; `current_activity` follows the open view. `remote.send_command` passes any `ctl` command (`play-pause`, `next-track`, `vu-select:2`, …) and honors `num_repeats` and `delay_secs`. |
 | `light.<name>_display` | backlight brightness (player 1..100 ↔ HA 0..255). Only created when the player has a backlight. There is no separate backlight power: on/off map to standby. |
+| `select.<name>_view` | the open view (Now playing, Queue, VU, Home; empty in standby); selecting one wakes the player and opens it — the same views as the remote's activities, as a dropdown. |
 | `select.<name>_vu_skin` | the player's VU skins in cycle order; selecting one opens the VU view on it. |
 
 Example automation:

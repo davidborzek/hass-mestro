@@ -116,3 +116,73 @@ async def test_unavailable_while_disconnected(
     fake_mestro.accept_ws = False
     await fake_mestro.drop_connections()
     await eventually(lambda: hass.states.get(SELECT).state == STATE_UNAVAILABLE)
+
+
+VIEW = "select.wohnzimmer_view"
+
+
+async def select_view(hass: HomeAssistant, option: str) -> None:
+    """Pick a view through the service."""
+    await hass.services.async_call(
+        SELECT_DOMAIN,
+        SERVICE_SELECT_OPTION,
+        {ATTR_ENTITY_ID: VIEW, ATTR_OPTION: option},
+        blocking=True,
+    )
+
+
+async def test_view_select_follows_the_open_view(
+    hass: HomeAssistant, fake_mestro: FakeMestro
+) -> None:
+    await setup_integration(hass, fake_mestro)
+
+    registered = er.async_get(hass).async_get(VIEW)
+    assert registered is not None
+    assert registered.unique_id == f"{PLAYER_ID}_view"
+    state = hass.states.get(VIEW)
+    assert state.attributes[ATTR_OPTIONS] == ["now_playing", "queue", "vu", "home"]
+
+    view = fake_mestro.state["view"]
+    view.update(now_playing=False, queue=False, vu=False, standby=False)
+    await push(hass, fake_mestro)
+    assert hass.states.get(VIEW).state == "home"
+
+    view.update(now_playing=True, queue=True)
+    await push(hass, fake_mestro)
+    assert hass.states.get(VIEW).state == "queue", "the topmost layer wins"
+
+    view.update(vu=True)
+    await push(hass, fake_mestro)
+    assert hass.states.get(VIEW).state == "vu"
+
+    view.update(standby=True)
+    await push(hass, fake_mestro)
+    assert hass.states.get(VIEW).state == STATE_UNKNOWN, "no view in standby"
+
+
+@pytest.mark.parametrize(
+    ("option", "command"),
+    [
+        ("now_playing", "now-playing"),
+        ("queue", "queue"),
+        ("vu", "vu"),
+        ("home", "home"),
+    ],
+)
+async def test_selecting_a_view_opens_it(
+    hass: HomeAssistant, fake_mestro: FakeMestro, option: str, command: str
+) -> None:
+    await setup_integration(hass, fake_mestro)
+
+    await select_view(hass, option)
+    assert fake_mestro.ctl_commands == [command]
+
+
+async def test_selecting_a_view_wakes_the_player_first(
+    hass: HomeAssistant, fake_mestro: FakeMestro
+) -> None:
+    fake_mestro.state["view"]["standby"] = True
+    await setup_integration(hass, fake_mestro)
+
+    await select_view(hass, "vu")
+    assert fake_mestro.ctl_commands == ["standby-off", "vu"]

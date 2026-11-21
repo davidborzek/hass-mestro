@@ -1,4 +1,4 @@
-"""Select platform: pick the VU skin the player shows."""
+"""Select platform: the view the player shows and its VU skin."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import MestroConfigEntry, MestroCoordinator
-from .entity import MestroEntity
+from .entity import VIEW_COMMANDS, MestroEntity, open_view
 
 PARALLEL_UPDATES = 0
 
@@ -17,8 +17,9 @@ async def async_setup_entry(
     entry: MestroConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Add the VU skin select once the player reports its skins."""
+    """Add the view select now, the VU skin select once skins are reported."""
     coordinator = entry.runtime_data
+    async_add_entities([MestroViewSelect(coordinator)])
     added = False
 
     @callback
@@ -59,3 +60,23 @@ class MestroVuSkinSelect(MestroEntity, SelectEntity):
         # HA already validated `option` against `options`
         index = self.state_data.vu_skins.index(option)
         await self.async_ctl(f"vu-select:{index}")
+
+
+class MestroViewSelect(MestroEntity, SelectEntity):
+    """The open view; selecting one wakes the player and opens it."""
+
+    _attr_translation_key = "view"
+
+    def __init__(self, coordinator: MestroCoordinator) -> None:
+        """Create the view select."""
+        super().__init__(coordinator, "view")
+        self._attr_options = list(VIEW_COMMANDS)
+
+    @property
+    def current_option(self) -> str | None:
+        """The open view, `None` in standby."""
+        return open_view(self.state_data)
+
+    async def async_select_option(self, option: str) -> None:
+        """Open the chosen view."""
+        await self.async_open_view(option)

@@ -64,6 +64,15 @@
       }
     },
     "select": {
+      "view": {
+        "name": "Ansicht",
+        "state": {
+          "now_playing": "Läuft gerade",
+          "queue": "Warteschlange",
+          "vu": "VU",
+          "home": "Start"
+        }
+      },
       "vu_skin": {
         "name": "VU-Skin"
       }

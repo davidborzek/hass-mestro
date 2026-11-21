@@ -64,6 +64,15 @@
       }
     },
     "select": {
+      "view": {
+        "name": "View",
+        "state": {
+          "now_playing": "Now playing",
+          "queue": "Queue",
+          "vu": "VU",
+          "home": "Home"
+        }
+      },
       "vu_skin": {
         "name": "VU skin"
       }

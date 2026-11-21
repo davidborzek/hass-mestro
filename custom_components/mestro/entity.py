@@ -10,6 +10,28 @@ from .client import MestroConnectionError, MestroRequestError, MestroState
 from .const import DOMAIN
 from .coordinator import MestroCoordinator
 
+# view key -> the `ctl` command that opens it (keys double as the view
+# select's translated options)
+VIEW_COMMANDS: dict[str, str] = {
+    "now_playing": "now-playing",
+    "queue": "queue",
+    "vu": "vu",
+    "home": "home",
+}
+
+
+def open_view(state: MestroState) -> str | None:
+    """The open view key, `None` in standby; the layers stack, so the topmost wins."""
+    if state.standby:
+        return None
+    if state.vu:
+        return "vu"
+    if state.queue:
+        return "queue"
+    if state.now_playing:
+        return "now_playing"
+    return "home"
+
 
 class MestroEntity(CoordinatorEntity[MestroCoordinator]):
     """Common device info and push-driven availability."""
@@ -39,6 +61,12 @@ class MestroEntity(CoordinatorEntity[MestroCoordinator]):
     def state_data(self) -> MestroState:
         """The latest pushed state."""
         return self.coordinator.data
+
+    async def async_open_view(self, view: str) -> None:
+        """Wake the player if needed, then open `view` (a VIEW_COMMANDS key)."""
+        if self.state_data.standby:
+            await self.async_ctl("standby-off")
+        await self.async_ctl(VIEW_COMMANDS[view])
 
     async def async_ctl(self, command: str) -> None:
         """Run a `ctl` command; failures surface as a service-call error."""

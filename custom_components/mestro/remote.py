@@ -21,17 +21,18 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import DOMAIN
 from .coordinator import MestroConfigEntry, MestroCoordinator
-from .entity import MestroEntity
+from .entity import MestroEntity, open_view
 
 PARALLEL_UPDATES = 0
 
-# activity name -> the `ctl` command that opens it
+# activity name -> the view it opens
 ACTIVITIES: dict[str, str] = {
-    "Now playing": "now-playing",
+    "Now playing": "now_playing",
     "Queue": "queue",
     "VU": "vu",
     "Home": "home",
 }
+ACTIVITY_OF_VIEW = {view: activity for activity, view in ACTIVITIES.items()}
 
 
 async def async_setup_entry(
@@ -62,17 +63,9 @@ class MestroRemote(MestroEntity, RemoteEntity):
 
     @property
     def current_activity(self) -> str | None:
-        """The open view; the layers stack, so the topmost wins."""
-        state = self.state_data
-        if state.standby:
-            return None
-        if state.vu:
-            return "VU"
-        if state.queue:
-            return "Queue"
-        if state.now_playing:
-            return "Now playing"
-        return "Home"
+        """The open view, `None` in standby."""
+        view = open_view(self.state_data)
+        return ACTIVITY_OF_VIEW[view] if view else None
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Wake the player, optionally straight into an activity."""
@@ -83,10 +76,10 @@ class MestroRemote(MestroEntity, RemoteEntity):
                 translation_key="unknown_activity",
                 translation_placeholders={"activity": str(activity)},
             )
-        if self.state_data.standby or activity is None:
+        if activity is None:
             await self.async_ctl("standby-off")
-        if activity is not None:
-            await self.async_ctl(ACTIVITIES[activity])
+        else:
+            await self.async_open_view(ACTIVITIES[activity])
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Put the player on standby."""
